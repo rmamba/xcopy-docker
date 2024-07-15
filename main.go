@@ -41,7 +41,8 @@ type XCopyFlags struct {
 func IsDirectory(path string) (bool, int) {
 	fi, err := os.Stat(path)
 	if err != nil {
-		return false, -3
+		fmt.Println(err.Error())
+		return false, 0
 	}
 	switch mode := fi.Mode(); {
 	case mode.IsDir():
@@ -132,7 +133,7 @@ func ParseArguments(args []string) (InputArguments, int) {
 func main() {
 	args, errCode := ParseArguments(os.Args[1:])
 	if errCode != 0 {
-		fmt.Println("Go implementation of MS-DOS xcopy command v0.0.3")
+		fmt.Println("Go implementation of MS-DOS xcopy command v0.0.4")
 		fmt.Println("xcopy source [destination]") //[/switches]
 		fmt.Println("  source       Specifies the directory and/or name of file(s) to copy.")
 		fmt.Println("  destination  Specifies the location and/or name of new file(s).")
