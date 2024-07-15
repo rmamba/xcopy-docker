@@ -41,7 +41,7 @@ type XCopyFlags struct {
 func IsDirectory(path string) (bool, int) {
 	fi, err := os.Stat(path)
 	if err != nil {
-		return false, -2
+		return false, -3
 	}
 	switch mode := fi.Mode(); {
 	case mode.IsDir():
@@ -116,7 +116,7 @@ func ParseArguments(args []string) (InputArguments, int) {
 	}
 
 	if arguments.Dest == "" || arguments.Source == "" {
-		return arguments, -1
+		return arguments, -2
 	}
 
 	exitCode := 0
@@ -132,7 +132,7 @@ func ParseArguments(args []string) (InputArguments, int) {
 func main() {
 	args, errCode := ParseArguments(os.Args[1:])
 	if errCode != 0 {
-		fmt.Println("Go implementation of MS-DOS xcopy command v0.0.2")
+		fmt.Println("Go implementation of MS-DOS xcopy command v0.0.3")
 		fmt.Println("xcopy source [destination]") //[/switches]
 		fmt.Println("  source       Specifies the directory and/or name of file(s) to copy.")
 		fmt.Println("  destination  Specifies the location and/or name of new file(s).")
@@ -155,7 +155,7 @@ func main() {
 		// fmt.Println("  /W           Waits for a keypress before beginning.")
 		// fmt.Println("  /Y           Suppresses prompting to confirm you want to overwrite an existing destination file and overwrites these files.")
 		// fmt.Println("  /-Y          Causes prompting to confirm you want to overwrite an existing destination file.")
-		os.Exit(1)
+		os.Exit(errCode)
 	}
 
 	if args.IsSourceDir {
