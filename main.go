@@ -132,7 +132,7 @@ func ParseArguments(args []string) (InputArguments, int) {
 func main() {
 	args, errCode := ParseArguments(os.Args[1:])
 	if errCode != 0 {
-		fmt.Println("Go implementation of MS-DOS xcopy coppand v0.0.1")
+		fmt.Println("Go implementation of MS-DOS xcopy command v0.0.2")
 		fmt.Println("xcopy source [destination]") //[/switches]
 		fmt.Println("  source       Specifies the directory and/or name of file(s) to copy.")
 		fmt.Println("  destination  Specifies the location and/or name of new file(s).")
