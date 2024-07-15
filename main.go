@@ -3,26 +3,97 @@ package main
 import (
 	"fmt"
 	"io"
-	"io/fs"
 	"os"
 	"strings"
 )
 
-func main() {
-	var fi fs.FileInfo
-	// var files []fs.DirEntry
-	var err error
+type InputArguments struct {
+	Dest        string `default:""`
+	Flags       XCopyFlags
+	IsDestDir   bool   `default:"false"`
+	IsSourceDir bool   `default:"false"`
+	Source      string `default:""`
+}
 
-	// useD := false
-	// useY := false
+type XCopyFlags struct {
+	A       bool   `default:"false"`
+	C       bool   `default:"false"`
+	D       bool   `default:"false"`
+	E       bool   `default:"false"`
+	F       bool   `default:"false"`
+	H       bool   `default:"false"`
+	I       bool   `default:"false"`
+	L       bool   `default:"false"`
+	M       bool   `default:"false"`
+	N       bool   `default:"false"`
+	P       bool   `default:"false"`
+	Q       bool   `default:"false"`
+	R       bool   `default:"false"`
+	S       bool   `default:"false"`
+	T       bool   `default:"false"`
+	V       bool   `default:"false"`
+	W       bool   `default:"false"`
+	Y       bool   `default:"false"`
+	MinusY  bool   `default:"false"`
+	ParamsD string `default:""`
+}
 
-	source := ""
-	dest := ""
-	isSourceDir := false
-	// isDestDir := false
+func IsDirectory(path string) (bool, int) {
+	fi, err := os.Stat(path)
+	if err != nil {
+		return false, -2
+	}
+	switch mode := fi.Mode(); {
+	case mode.IsDir():
+		return true, 0
+	}
+	return false, 0
+}
 
-	args := os.Args[1:] // get arguments from command line
+// Hello returns a greeting for the named person.
+func ParseArguments(args []string) (InputArguments, int) {
+	arguments := InputArguments{}
+
 	if len(args) < 2 {
+		return arguments, -1
+	}
+
+	// Parse arguments
+	for _, a := range args {
+		if strings.HasPrefix(a, "/") && len(a) == 2 {
+			// switch a {
+			// case "/Y":
+			// 	useY = true
+			// case "/D":
+			// 	useD = true
+			// 	// default:
+			// 	// 	// freebsd, openbsd,
+			// 	// 	// plan9, windows...
+			// 	// 	fmt.Printf("%s.\n", os)
+			// }
+		} else {
+			if arguments.Source == "" {
+				arguments.Source = strings.Trim(a, "\"")
+			} else {
+				arguments.Dest = strings.Trim(a, "\"")
+			}
+		}
+	}
+
+	exitCode := 0
+
+	arguments.IsSourceDir, exitCode = IsDirectory(arguments.Source)
+	if exitCode != 0 {
+		return arguments, exitCode
+	}
+
+	arguments.IsDestDir, _ = IsDirectory(arguments.Dest)
+	return arguments, 0
+}
+
+func main() {
+	args, errCode := ParseArguments(os.Args[1:])
+	if errCode != 0 {
 		fmt.Println("Go implementation of MS-DOS xcopy coppand v0.0.1")
 		fmt.Println("xcopy source [destination]") //[/switches]
 		fmt.Println("  source       Specifies the directory and/or name of file(s) to copy.")
@@ -49,39 +120,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Parse arguments
-	for _, a := range args {
-		if strings.HasPrefix(a, "/") {
-			// switch a {
-			// case "/Y":
-			// 	useY = true
-			// case "/D":
-			// 	useD = true
-			// 	// default:
-			// 	// 	// freebsd, openbsd,
-			// 	// 	// plan9, windows...
-			// 	// 	fmt.Printf("%s.\n", os)
-			// }
-		} else {
-			if source == "" {
-				source = a
-			} else {
-				dest = a
-			}
-		}
-	}
-
-	fi, err = os.Stat(source)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	switch mode := fi.Mode(); {
-	case mode.IsDir():
-		isSourceDir = true
-	}
-
-	if isSourceDir {
+	if args.IsSourceDir {
 		os.Exit(13)
 		// files, err = os.ReadDir(source)
 		// if err != nil {
@@ -103,16 +142,16 @@ func main() {
 		// 	os.Exit(4)
 		// }
 	} else {
-		src, err := os.Open(source)
+		src, err := os.Open(args.Source)
 		if err != nil {
-			fmt.Printf("Error opening source file %s: %v\n", args[0], err)
+			fmt.Printf("Error opening source file %s: %v\n", args.Source, err)
 			os.Exit(1)
 		}
 		defer src.Close()
 
-		dst, err := os.Create(dest)
+		dst, err := os.Create(args.Dest)
 		if err != nil {
-			fmt.Printf("Error creating destination file %s: %v\n", args[1], err)
+			fmt.Printf("Error creating destination file %s: %v\n", args.Dest, err)
 			os.Exit(4)
 		}
 		defer dst.Close()
@@ -124,47 +163,5 @@ func main() {
 		}
 	}
 
-	// src, err := os.Open(args[0])
-	// // if err != nil {
-	// // 	fmt.Printf("Error opening source directory %s: %v\n", args[0], err)
-	// // 	os.Exit(1)
-	// // }
-	// // defer src.Close()
-
-	// // dst, err := os.Create(args[1])
-	// // if err != nil {
-	// // 	fmt.Printf("Error creating destination directory %s: %v\n", args[1], err)
-	// // 	os.Exit(1)
-	// // }
-	// // defer dst.Close()
-
-	// for _, file := range files {
-	// 	// skip directories and links
-	// 	if !file.IsDir() && !file.Mode().IsRegular() {
-	// 		continue
-	// 	}
-
-	// 	srcFile, err := os.Open(filepath.Join(src, file.Name()))
-	// 	if err != nil {
-	// 		fmt.Printf("Error opening source file %s: %v\n", file.Name(), err)
-	// 		continue
-	// 	}
-	// 	defer srcFile.Close()
-
-	// 	dstFile, err := os.Create(filepath.Join(dst, file.Name()))
-	// 	if err != nil {
-	// 		fmt.Printf("Error creating destination file %s: %v\n", file.Name(), err)
-	// 		continue
-	// 	}
-	// 	defer dstFile.Close()
-
-	// 	_, err = io.Copy(dstFile, srcFile)
-	// 	if err != nil {
-	// 		fmt.Println("Error copying data from source to destination")
-	// 		return
-	// 	}
-	// }
-
-	// fmt.Printf("Successfully copied %d files\n", len(files))
 	os.Exit(0)
 }
