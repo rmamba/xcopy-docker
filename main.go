@@ -107,9 +107,9 @@ func ParseArguments(args []string) (InputArguments, int) {
 				arguments.Flags.ParamsD = a[2:]
 			} else {
 				if arguments.Source == "" {
-					arguments.Source = strings.Trim(a, "\"")
+					arguments.Source = strings.ReplaceAll(strings.Trim(a, "\""), "\\", "/")
 				} else {
-					arguments.Dest = strings.Trim(a, "\"")
+					arguments.Dest = strings.ReplaceAll(strings.Trim(a, "\""), "\\", "/")
 				}
 			}
 		}

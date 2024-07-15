@@ -480,11 +480,34 @@ func TestParameterDate(t *testing.T) {
 	CheckStr(t, args.Flags.ParamsD, "031019")
 }
 
-// // TestHelloEmpty calls greetings.Hello with an empty string,
-// // checking for an error.
-// func TestHelloEmpty(t *testing.T) {
-// 	msg, err := Hello("")
-// 	if msg != "" || err == nil {
-// 		t.Fatalf(`Hello("") = %q, %v, want "", error`, msg, err)
-// 	}
-// }
+func TestRealExample(t *testing.T) {
+	args, errCode := ParseArguments([]string{"/Y", "/D", "\"/source/Eplass.Web.Client.FullClient\\appSettings.json\"", "\"/source/Eplass.Web.Client.FullClient.Test/bin/Release/net7.0\\appSettings.json\""})
+	CheckInt(t, errCode, 0)
+
+	CheckStr(t, args.Source, "/source/Eplass.Web.Client.FullClient/appSettings.json")
+	CheckStr(t, args.Dest, "/source/Eplass.Web.Client.FullClient.Test/bin/Release/net7.0/appSettings.json")
+
+	CheckBool(t, args.IsSourceDir, false)
+	CheckBool(t, args.IsDestDir, false)
+
+	CheckBool(t, args.Flags.A, false)
+	CheckBool(t, args.Flags.C, false)
+	CheckBool(t, args.Flags.D, true)
+	CheckBool(t, args.Flags.E, false)
+	CheckBool(t, args.Flags.F, false)
+	CheckBool(t, args.Flags.H, false)
+	CheckBool(t, args.Flags.I, false)
+	CheckBool(t, args.Flags.L, false)
+	CheckBool(t, args.Flags.M, false)
+	CheckBool(t, args.Flags.MinusY, false)
+	CheckBool(t, args.Flags.N, false)
+	CheckBool(t, args.Flags.P, false)
+	CheckBool(t, args.Flags.Q, false)
+	CheckBool(t, args.Flags.R, false)
+	CheckBool(t, args.Flags.S, false)
+	CheckBool(t, args.Flags.T, false)
+	CheckBool(t, args.Flags.V, false)
+	CheckBool(t, args.Flags.W, false)
+	CheckBool(t, args.Flags.Y, true)
+	CheckStr(t, args.Flags.ParamsD, "")
+}
