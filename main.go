@@ -60,28 +60,66 @@ func ParseArguments(args []string) (InputArguments, int) {
 
 	// Parse arguments
 	for _, a := range args {
-		if strings.HasPrefix(a, "/") && len(a) == 2 {
-			// switch a {
-			// case "/Y":
-			// 	useY = true
-			// case "/D":
-			// 	useD = true
-			// 	// default:
-			// 	// 	// freebsd, openbsd,
-			// 	// 	// plan9, windows...
-			// 	// 	fmt.Printf("%s.\n", os)
-			// }
+		if strings.HasPrefix(a, "/") && (len(a) == 2 || len(a) == 3) {
+			switch a {
+			case "/A":
+				arguments.Flags.A = true
+			case "/C":
+				arguments.Flags.C = true
+			case "/D":
+				arguments.Flags.D = true
+			case "/E":
+				arguments.Flags.E = true
+			case "/F":
+				arguments.Flags.F = true
+			case "/H":
+				arguments.Flags.H = true
+			case "/I":
+				arguments.Flags.I = true
+			case "/L":
+				arguments.Flags.L = true
+			case "/M":
+				arguments.Flags.M = true
+			case "/N":
+				arguments.Flags.N = true
+			case "/P":
+				arguments.Flags.P = true
+			case "/Q":
+				arguments.Flags.Q = true
+			case "/R":
+				arguments.Flags.R = true
+			case "/S":
+				arguments.Flags.S = true
+			case "/T":
+				arguments.Flags.T = true
+			case "/V":
+				arguments.Flags.V = true
+			case "/W":
+				arguments.Flags.W = true
+			case "/Y":
+				arguments.Flags.Y = true
+			case "/-Y":
+				arguments.Flags.MinusY = true
+			}
 		} else {
-			if arguments.Source == "" {
-				arguments.Source = strings.Trim(a, "\"")
+			if strings.HasPrefix(a, "/D") && (len(a) == 8) {
+				arguments.Flags.D = true
+				arguments.Flags.ParamsD = a[2:]
 			} else {
-				arguments.Dest = strings.Trim(a, "\"")
+				if arguments.Source == "" {
+					arguments.Source = strings.Trim(a, "\"")
+				} else {
+					arguments.Dest = strings.Trim(a, "\"")
+				}
 			}
 		}
 	}
 
-	exitCode := 0
+	if arguments.Dest == "" || arguments.Source == "" {
+		return arguments, -1
+	}
 
+	exitCode := 0
 	arguments.IsSourceDir, exitCode = IsDirectory(arguments.Source)
 	if exitCode != 0 {
 		return arguments, exitCode
