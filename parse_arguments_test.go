@@ -39,6 +39,7 @@ func TestFileCopy(t *testing.T) {
 	CheckStr(t, args.Source, "go.mod")
 	CheckStr(t, args.Dest, "go.mod.copied_by_test")
 
+	CheckBool(t, args.UsesWildcards, false)
 	CheckBool(t, args.IsSourceDir, false)
 	CheckBool(t, args.IsDestDir, false)
 
@@ -65,12 +66,13 @@ func TestFileCopy(t *testing.T) {
 }
 
 func TestFileCopyToFolder(t *testing.T) {
-	args, errCode := ParseArguments([]string{"go.mod", "/tmp"})
+	args, errCode := ParseArguments([]string{"go.mod", "/tmp/"})
 	CheckInt(t, errCode, 0)
 
 	CheckStr(t, args.Source, "go.mod")
-	CheckStr(t, args.Dest, "/tmp")
+	CheckStr(t, args.Dest, "/tmp/")
 
+	CheckBool(t, args.UsesWildcards, false)
 	CheckBool(t, args.IsSourceDir, false)
 	CheckBool(t, args.IsDestDir, true)
 
@@ -103,6 +105,7 @@ func TestFileCopyToFolderRenamed(t *testing.T) {
 	CheckStr(t, args.Source, "go.mod")
 	CheckStr(t, args.Dest, "/tmp/go.mod.copied_by_test")
 
+	CheckBool(t, args.UsesWildcards, false)
 	CheckBool(t, args.IsSourceDir, false)
 	CheckBool(t, args.IsDestDir, false)
 
@@ -135,6 +138,7 @@ func TestParametersWithQuotes(t *testing.T) {
 	CheckStr(t, args.Source, "go.mod")
 	CheckStr(t, args.Dest, "go.mod.copied_by_test")
 
+	CheckBool(t, args.UsesWildcards, false)
 	CheckBool(t, args.IsSourceDir, false)
 	CheckBool(t, args.IsDestDir, false)
 
@@ -162,11 +166,12 @@ func TestParametersWithQuotes(t *testing.T) {
 
 func TestParametersWithoutSource(t *testing.T) {
 	args, errCode := ParseArguments([]string{"/Y", "/D"})
-	CheckInt(t, errCode, -1)
+	CheckInt(t, errCode, -2)
 
 	CheckStr(t, args.Source, "")
 	CheckStr(t, args.Dest, "")
 
+	CheckBool(t, args.UsesWildcards, false)
 	CheckBool(t, args.IsSourceDir, false)
 	CheckBool(t, args.IsDestDir, false)
 
@@ -194,11 +199,12 @@ func TestParametersWithoutSource(t *testing.T) {
 
 func TestParametersWithoutDest(t *testing.T) {
 	args, errCode := ParseArguments([]string{"/Y", "\"go.mod\""})
-	CheckInt(t, errCode, -1)
+	CheckInt(t, errCode, -2)
 
 	CheckStr(t, args.Source, "go.mod")
 	CheckStr(t, args.Dest, "")
 
+	CheckBool(t, args.UsesWildcards, false)
 	CheckBool(t, args.IsSourceDir, false)
 	CheckBool(t, args.IsDestDir, false)
 
@@ -231,6 +237,7 @@ func TestParameterA(t *testing.T) {
 	CheckStr(t, args.Source, "go.mod")
 	CheckStr(t, args.Dest, "go.mod.copied_by_test")
 
+	CheckBool(t, args.UsesWildcards, false)
 	CheckBool(t, args.IsSourceDir, false)
 	CheckBool(t, args.IsDestDir, false)
 
@@ -263,6 +270,7 @@ func TestParameterACD(t *testing.T) {
 	CheckStr(t, args.Source, "go.mod")
 	CheckStr(t, args.Dest, "go.mod.copied_by_test")
 
+	CheckBool(t, args.UsesWildcards, false)
 	CheckBool(t, args.IsSourceDir, false)
 	CheckBool(t, args.IsDestDir, false)
 
@@ -295,6 +303,7 @@ func TestParameterEFH(t *testing.T) {
 	CheckStr(t, args.Source, "go.mod")
 	CheckStr(t, args.Dest, "go.mod.copied_by_test")
 
+	CheckBool(t, args.UsesWildcards, false)
 	CheckBool(t, args.IsSourceDir, false)
 	CheckBool(t, args.IsDestDir, false)
 
@@ -327,6 +336,7 @@ func TestParameterILMNP(t *testing.T) {
 	CheckStr(t, args.Source, "go.mod")
 	CheckStr(t, args.Dest, "go.mod.copied_by_test")
 
+	CheckBool(t, args.UsesWildcards, false)
 	CheckBool(t, args.IsSourceDir, false)
 	CheckBool(t, args.IsDestDir, false)
 
@@ -359,6 +369,7 @@ func TestParameterQRST(t *testing.T) {
 	CheckStr(t, args.Source, "go.mod")
 	CheckStr(t, args.Dest, "go.mod.copied_by_test")
 
+	CheckBool(t, args.UsesWildcards, false)
 	CheckBool(t, args.IsSourceDir, false)
 	CheckBool(t, args.IsDestDir, false)
 
@@ -391,6 +402,7 @@ func TestParameterVWY(t *testing.T) {
 	CheckStr(t, args.Source, "go.mod")
 	CheckStr(t, args.Dest, "go.mod.copied_by_test")
 
+	CheckBool(t, args.UsesWildcards, false)
 	CheckBool(t, args.IsSourceDir, false)
 	CheckBool(t, args.IsDestDir, false)
 
@@ -423,6 +435,7 @@ func TestParameterMinusY(t *testing.T) {
 	CheckStr(t, args.Source, "go.mod")
 	CheckStr(t, args.Dest, "go.mod.copied_by_test")
 
+	CheckBool(t, args.UsesWildcards, false)
 	CheckBool(t, args.IsSourceDir, false)
 	CheckBool(t, args.IsDestDir, false)
 
@@ -455,6 +468,7 @@ func TestParameterDate(t *testing.T) {
 	CheckStr(t, args.Source, "go.mod")
 	CheckStr(t, args.Dest, "go.mod.copied_by_test")
 
+	CheckBool(t, args.UsesWildcards, false)
 	CheckBool(t, args.IsSourceDir, false)
 	CheckBool(t, args.IsDestDir, false)
 
@@ -480,15 +494,115 @@ func TestParameterDate(t *testing.T) {
 	CheckStr(t, args.Flags.ParamsD, "031019")
 }
 
-func TestRealExample(t *testing.T) {
-	args, errCode := ParseArguments([]string{"/Y", "/D", "\"/source/Eplass.Web.Client.FullClient\\appSettings.json\"", "\"/source/Eplass.Web.Client.FullClient.Test/bin/Release/net7.0\\appSettings.json\""})
+func TestRealMissingSource(t *testing.T) {
+	args, errCode := ParseArguments([]string{"/Y", "/D", "\"/tmp/unknown.json\"", "\"/tmp/renamed.json\""})
 	CheckInt(t, errCode, 0)
 
-	CheckStr(t, args.Source, "/source/Eplass.Web.Client.FullClient/appSettings.json")
-	CheckStr(t, args.Dest, "/source/Eplass.Web.Client.FullClient.Test/bin/Release/net7.0/appSettings.json")
+	CheckStr(t, args.Source, "/tmp/unknown.json")
+	CheckStr(t, args.Dest, "/tmp/renamed.json")
 
+	CheckBool(t, args.UsesWildcards, false)
 	CheckBool(t, args.IsSourceDir, false)
 	CheckBool(t, args.IsDestDir, false)
+
+	CheckBool(t, args.Flags.A, false)
+	CheckBool(t, args.Flags.C, false)
+	CheckBool(t, args.Flags.D, true)
+	CheckBool(t, args.Flags.E, false)
+	CheckBool(t, args.Flags.F, false)
+	CheckBool(t, args.Flags.H, false)
+	CheckBool(t, args.Flags.I, false)
+	CheckBool(t, args.Flags.L, false)
+	CheckBool(t, args.Flags.M, false)
+	CheckBool(t, args.Flags.MinusY, false)
+	CheckBool(t, args.Flags.N, false)
+	CheckBool(t, args.Flags.P, false)
+	CheckBool(t, args.Flags.Q, false)
+	CheckBool(t, args.Flags.R, false)
+	CheckBool(t, args.Flags.S, false)
+	CheckBool(t, args.Flags.T, false)
+	CheckBool(t, args.Flags.V, false)
+	CheckBool(t, args.Flags.W, false)
+	CheckBool(t, args.Flags.Y, true)
+	CheckStr(t, args.Flags.ParamsD, "")
+}
+
+func TestCopySuccess(t *testing.T) {
+	args, errCode := ParseArguments([]string{"/Y", "/D", "\"main.go\"", "\"tested_main.go\""})
+	CheckInt(t, errCode, 0)
+
+	CheckStr(t, args.Source, "main.go")
+	CheckStr(t, args.Dest, "tested_main.go")
+
+	CheckBool(t, args.UsesWildcards, false)
+	CheckBool(t, args.IsSourceDir, false)
+	CheckBool(t, args.IsDestDir, false)
+
+	CheckBool(t, args.Flags.A, false)
+	CheckBool(t, args.Flags.C, false)
+	CheckBool(t, args.Flags.D, true)
+	CheckBool(t, args.Flags.E, false)
+	CheckBool(t, args.Flags.F, false)
+	CheckBool(t, args.Flags.H, false)
+	CheckBool(t, args.Flags.I, false)
+	CheckBool(t, args.Flags.L, false)
+	CheckBool(t, args.Flags.M, false)
+	CheckBool(t, args.Flags.MinusY, false)
+	CheckBool(t, args.Flags.N, false)
+	CheckBool(t, args.Flags.P, false)
+	CheckBool(t, args.Flags.Q, false)
+	CheckBool(t, args.Flags.R, false)
+	CheckBool(t, args.Flags.S, false)
+	CheckBool(t, args.Flags.T, false)
+	CheckBool(t, args.Flags.V, false)
+	CheckBool(t, args.Flags.W, false)
+	CheckBool(t, args.Flags.Y, true)
+	CheckStr(t, args.Flags.ParamsD, "")
+}
+
+func TestCopyToNewLocationSuccess(t *testing.T) {
+	args, errCode := ParseArguments([]string{"/Y", "/D", "\"main.go\"", "\"tests/main.go\""})
+	CheckInt(t, errCode, 0)
+
+	CheckStr(t, args.Source, "main.go")
+	CheckStr(t, args.Dest, "tests/main.go")
+
+	CheckBool(t, args.UsesWildcards, false)
+	CheckBool(t, args.IsSourceDir, false)
+	CheckBool(t, args.IsDestDir, false)
+
+	CheckBool(t, args.Flags.A, false)
+	CheckBool(t, args.Flags.C, false)
+	CheckBool(t, args.Flags.D, true)
+	CheckBool(t, args.Flags.E, false)
+	CheckBool(t, args.Flags.F, false)
+	CheckBool(t, args.Flags.H, false)
+	CheckBool(t, args.Flags.I, false)
+	CheckBool(t, args.Flags.L, false)
+	CheckBool(t, args.Flags.M, false)
+	CheckBool(t, args.Flags.MinusY, false)
+	CheckBool(t, args.Flags.N, false)
+	CheckBool(t, args.Flags.P, false)
+	CheckBool(t, args.Flags.Q, false)
+	CheckBool(t, args.Flags.R, false)
+	CheckBool(t, args.Flags.S, false)
+	CheckBool(t, args.Flags.T, false)
+	CheckBool(t, args.Flags.V, false)
+	CheckBool(t, args.Flags.W, false)
+	CheckBool(t, args.Flags.Y, true)
+	CheckStr(t, args.Flags.ParamsD, "")
+}
+
+func TestCopyWithWildcardSuccess(t *testing.T) {
+	args, errCode := ParseArguments([]string{"/Y", "/D", "\"main*.go\"", "\"tests/\""})
+	CheckInt(t, errCode, 0)
+
+	CheckStr(t, args.Source, "main*.go")
+	CheckStr(t, args.Dest, "tests/")
+
+	CheckBool(t, args.UsesWildcards, true)
+	CheckBool(t, args.IsSourceDir, false)
+	CheckBool(t, args.IsDestDir, true)
 
 	CheckBool(t, args.Flags.A, false)
 	CheckBool(t, args.Flags.C, false)
