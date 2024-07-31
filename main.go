@@ -67,7 +67,10 @@ func ParseArguments(args []string) (InputArguments, int) {
 	}
 
 	// Parse arguments
-	for _, a := range args {
+	for i, a := range args {
+		if os.Getenv("XCOPY_DEBUG") == "true" {
+			fmt.Printf("XCOPY_DEBUG_ARGS[%d]: `%s`\n", i, a)
+		}
 		if strings.HasPrefix(a, "/") && (len(a) == 2 || len(a) == 3) {
 			switch a {
 			case "/A":
@@ -177,7 +180,7 @@ func CopyFile(sourceFileName string, dest string, isDestDir bool) {
 func main() {
 	args, errCode := ParseArguments(os.Args[1:])
 	if errCode != 0 {
-		fmt.Println("Go implementation of MS-DOS xcopy command v0.0.6")
+		fmt.Println("Go implementation of MS-DOS xcopy command v0.0.7")
 		fmt.Println("xcopy source [destination]") //[/switches]
 		fmt.Println("  source       Specifies the directory and/or name of file(s) to copy.")
 		fmt.Println("  destination  Specifies the location and/or name of new file(s).")
