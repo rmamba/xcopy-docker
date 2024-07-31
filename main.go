@@ -146,7 +146,7 @@ func CopyFile(sourceFileName string, dest string, isDestDir bool) {
 		folderStr = "directory "
 	}
 	if os.Getenv("XCOPY_DEBUG") == "true" {
-		fmt.Printf("Copy from `%s` to %s`%s`\n", sourceFileName, folderStr, dest)
+		fmt.Printf("XCOPY_DEBUG: from `%s` to %s`%s`\n", sourceFileName, folderStr, dest)
 	}
 
 	src, err := os.Open(sourceFileName)
