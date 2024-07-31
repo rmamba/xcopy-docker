@@ -141,6 +141,14 @@ func ParseArguments(args []string) (InputArguments, int) {
 }
 
 func CopyFile(sourceFileName string, dest string, isDestDir bool) {
+	folderStr := ""
+	if isDestDir {
+		folderStr = "directory "
+	}
+	if os.Getenv("XCOPY_DEBUG") == "true" {
+		fmt.Printf("Copy from `%s` to %s`%s`", sourceFileName, folderStr, dest)
+	}
+
 	src, err := os.Open(sourceFileName)
 	if err != nil {
 		fmt.Printf("Error opening source file %s: %v\n", sourceFileName, err)

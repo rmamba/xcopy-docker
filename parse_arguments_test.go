@@ -527,6 +527,72 @@ func TestRealMissingSource(t *testing.T) {
 	CheckStr(t, args.Flags.ParamsD, "")
 }
 
+func TestCopyFoldersSuccess(t *testing.T) {
+	args, errCode := ParseArguments([]string{"/Y", "/D", "\"/tmp/\"", "\"/tmp2/\""})
+	CheckInt(t, errCode, 0)
+
+	CheckStr(t, args.Source, "/tmp/")
+	CheckStr(t, args.Dest, "/tmp2/")
+
+	CheckBool(t, args.UsesWildcards, false)
+	CheckBool(t, args.IsSourceDir, true)
+	CheckBool(t, args.IsDestDir, true)
+
+	CheckBool(t, args.Flags.A, false)
+	CheckBool(t, args.Flags.C, false)
+	CheckBool(t, args.Flags.D, true)
+	CheckBool(t, args.Flags.E, false)
+	CheckBool(t, args.Flags.F, false)
+	CheckBool(t, args.Flags.H, false)
+	CheckBool(t, args.Flags.I, false)
+	CheckBool(t, args.Flags.L, false)
+	CheckBool(t, args.Flags.M, false)
+	CheckBool(t, args.Flags.MinusY, false)
+	CheckBool(t, args.Flags.N, false)
+	CheckBool(t, args.Flags.P, false)
+	CheckBool(t, args.Flags.Q, false)
+	CheckBool(t, args.Flags.R, false)
+	CheckBool(t, args.Flags.S, false)
+	CheckBool(t, args.Flags.T, false)
+	CheckBool(t, args.Flags.V, false)
+	CheckBool(t, args.Flags.W, false)
+	CheckBool(t, args.Flags.Y, true)
+	CheckStr(t, args.Flags.ParamsD, "")
+}
+
+func TestCopyFoldersWithoutQuotesSuccess(t *testing.T) {
+	args, errCode := ParseArguments([]string{"/Y", "/D", "/tmp/", "/tmp2/"})
+	CheckInt(t, errCode, 0)
+
+	CheckStr(t, args.Source, "/tmp/")
+	CheckStr(t, args.Dest, "/tmp2/")
+
+	CheckBool(t, args.UsesWildcards, false)
+	CheckBool(t, args.IsSourceDir, true)
+	CheckBool(t, args.IsDestDir, true)
+
+	CheckBool(t, args.Flags.A, false)
+	CheckBool(t, args.Flags.C, false)
+	CheckBool(t, args.Flags.D, true)
+	CheckBool(t, args.Flags.E, false)
+	CheckBool(t, args.Flags.F, false)
+	CheckBool(t, args.Flags.H, false)
+	CheckBool(t, args.Flags.I, false)
+	CheckBool(t, args.Flags.L, false)
+	CheckBool(t, args.Flags.M, false)
+	CheckBool(t, args.Flags.MinusY, false)
+	CheckBool(t, args.Flags.N, false)
+	CheckBool(t, args.Flags.P, false)
+	CheckBool(t, args.Flags.Q, false)
+	CheckBool(t, args.Flags.R, false)
+	CheckBool(t, args.Flags.S, false)
+	CheckBool(t, args.Flags.T, false)
+	CheckBool(t, args.Flags.V, false)
+	CheckBool(t, args.Flags.W, false)
+	CheckBool(t, args.Flags.Y, true)
+	CheckStr(t, args.Flags.ParamsD, "")
+}
+
 func TestCopySuccess(t *testing.T) {
 	args, errCode := ParseArguments([]string{"/Y", "/D", "\"main.go\"", "\"tested_main.go\""})
 	CheckInt(t, errCode, 0)
