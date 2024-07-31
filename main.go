@@ -146,7 +146,7 @@ func CopyFile(sourceFileName string, dest string, isDestDir bool) {
 		folderStr = "directory "
 	}
 	if os.Getenv("XCOPY_DEBUG") == "true" {
-		fmt.Printf("Copy from `%s` to %s`%s`", sourceFileName, folderStr, dest)
+		fmt.Printf("Copy from `%s` to %s`%s`\n", sourceFileName, folderStr, dest)
 	}
 
 	src, err := os.Open(sourceFileName)
@@ -177,7 +177,7 @@ func CopyFile(sourceFileName string, dest string, isDestDir bool) {
 func main() {
 	args, errCode := ParseArguments(os.Args[1:])
 	if errCode != 0 {
-		fmt.Println("Go implementation of MS-DOS xcopy command v0.0.5")
+		fmt.Println("Go implementation of MS-DOS xcopy command v0.0.6")
 		fmt.Println("xcopy source [destination]") //[/switches]
 		fmt.Println("  source       Specifies the directory and/or name of file(s) to copy.")
 		fmt.Println("  destination  Specifies the location and/or name of new file(s).")
@@ -200,6 +200,34 @@ func main() {
 		// fmt.Println("  /W           Waits for a keypress before beginning.")
 		// fmt.Println("  /Y           Suppresses prompting to confirm you want to overwrite an existing destination file and overwrites these files.")
 		// fmt.Println("  /-Y          Causes prompting to confirm you want to overwrite an existing destination file.")
+		if os.Getenv("XCOPY_DEBUG") == "true" {
+			fmt.Println("DEBUG:")
+			fmt.Printf("      SOURCE: `%s`\n", args.Source)
+			fmt.Printf("        DEST: `%s`\n", args.Dest)
+			fmt.Printf("  SOURCE_DIR: `%t`\n", args.IsSourceDir)
+			fmt.Printf("    DEST_DIR: `%t`\n", args.IsDestDir)
+			fmt.Printf("           *: `%t`\n", args.UsesWildcards)
+			fmt.Printf("          /A: `%t`\n", args.Flags.A)
+			fmt.Printf("          /C: `%t`\n", args.Flags.C)
+			fmt.Printf("          /D: `%t`\n", args.Flags.D)
+			fmt.Printf("           D: `%s`\n", args.Flags.ParamsD)
+			fmt.Printf("          /E: `%t`\n", args.Flags.E)
+			fmt.Printf("          /F: `%t`\n", args.Flags.F)
+			fmt.Printf("          /H: `%t`\n", args.Flags.H)
+			fmt.Printf("          /I: `%t`\n", args.Flags.I)
+			fmt.Printf("          /L: `%t`\n", args.Flags.L)
+			fmt.Printf("          /M: `%t`\n", args.Flags.M)
+			fmt.Printf("          /N: `%t`\n", args.Flags.N)
+			fmt.Printf("          /P: `%t`\n", args.Flags.P)
+			fmt.Printf("          /Q: `%t`\n", args.Flags.Q)
+			fmt.Printf("          /R: `%t`\n", args.Flags.R)
+			fmt.Printf("          /S: `%t`\n", args.Flags.S)
+			fmt.Printf("          /T: `%t`\n", args.Flags.T)
+			fmt.Printf("          /V: `%t`\n", args.Flags.V)
+			fmt.Printf("          /W: `%t`\n", args.Flags.W)
+			fmt.Printf("          /Y: `%t`\n", args.Flags.Y)
+			fmt.Printf("         /-Y: `%t`\n", args.Flags.MinusY)
+		}
 		os.Exit(errCode)
 	}
 
