@@ -554,6 +554,40 @@ func TestCopyFoldersWithoutQuotesSuccess(t *testing.T) {
 	CheckStr(t, args[0].Flags.ParamsD, "")
 }
 
+func TestCopyToExistingFolderSuccess(t *testing.T) {
+	args, errCode := ParseArguments([]string{"/Y", "/D", "/tmp/", "tests"})
+	CheckInt(t, errCode, 0)
+	CheckInt(t, len(args), 1)
+
+	CheckStr(t, args[0].Source, "/tmp/")
+	CheckStr(t, args[0].Dest, "tests")
+
+	CheckBool(t, args[0].UsesWildcards, false)
+	CheckBool(t, args[0].IsSourceDir, true)
+	CheckBool(t, args[0].IsDestDir, true)
+
+	CheckBool(t, args[0].Flags.A, false)
+	CheckBool(t, args[0].Flags.C, false)
+	CheckBool(t, args[0].Flags.D, true)
+	CheckBool(t, args[0].Flags.E, false)
+	CheckBool(t, args[0].Flags.F, false)
+	CheckBool(t, args[0].Flags.H, false)
+	CheckBool(t, args[0].Flags.I, false)
+	CheckBool(t, args[0].Flags.L, false)
+	CheckBool(t, args[0].Flags.M, false)
+	CheckBool(t, args[0].Flags.MinusY, false)
+	CheckBool(t, args[0].Flags.N, false)
+	CheckBool(t, args[0].Flags.P, false)
+	CheckBool(t, args[0].Flags.Q, false)
+	CheckBool(t, args[0].Flags.R, false)
+	CheckBool(t, args[0].Flags.S, false)
+	CheckBool(t, args[0].Flags.T, false)
+	CheckBool(t, args[0].Flags.V, false)
+	CheckBool(t, args[0].Flags.W, false)
+	CheckBool(t, args[0].Flags.Y, true)
+	CheckStr(t, args[0].Flags.ParamsD, "")
+}
+
 func TestCopySuccess(t *testing.T) {
 	args, errCode := ParseArguments([]string{"/Y", "/D", "\"main.go\"", "\"tested_main.go\""})
 	CheckInt(t, errCode, 0)

@@ -59,6 +59,19 @@ func IsDirectory(path string) bool {
 	return false
 }
 
+func Choose[T any](ss []T, test func(T) bool) (ret []T) {
+	for _, s := range ss {
+		if test(s) {
+			ret = append(ret, s)
+		}
+	}
+	return
+}
+
+func noEmptyStrings(s string) bool {
+	return s != ""
+}
+
 // Hello returns a greeting for the named person.
 func ParseArguments(args []string) ([]InputArguments, int) {
 	arguments := []InputArguments{}
@@ -73,14 +86,14 @@ func ParseArguments(args []string) ([]InputArguments, int) {
 		s := strings.ReplaceAll(a, "\r", "")
 		if strings.Contains(s, "\nxcopy") {
 			res1 := strings.Split(s, "\nxcopy")
-			res2 := strings.Split(res1[0], " ")
+			res2 := Choose(strings.Split(res1[0], " "), noEmptyStrings)
 			cleanedArguments = append(cleanedArguments, res2...)
 			res3, err := ParseArguments(cleanedArguments)
 			if err != 0 {
 				return arguments, -5
 			}
 			arguments = append(arguments, res3...)
-			cleanedArguments = strings.Split(res1[1], " ")
+			cleanedArguments = Choose(strings.Split(res1[1], " "), noEmptyStrings)
 		} else {
 			cleanedArguments = append(cleanedArguments, a)
 		}
