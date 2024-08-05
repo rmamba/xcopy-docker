@@ -59,80 +59,100 @@ type XCopyFlags struct {
 // }
 
 // Hello returns a greeting for the named person.
-func ParseArguments(args []string) (InputArguments, int) {
-	arguments := InputArguments{}
+func ParseArguments(args []string) ([]InputArguments, int) {
+	arguments := []InputArguments{}
+	currentArguments := InputArguments{}
 
 	if len(args) < 2 {
 		return arguments, -1
 	}
 
+	cleanedArguments := []string{}
+	for _, a := range args {
+		s := strings.ReplaceAll(a, "\r", "")
+		if strings.Contains(s, "\nxcopy") {
+			res1 := strings.Split(s, "\nxcopy")
+			res2 := strings.Split(res1[0], " ")
+			cleanedArguments = append(cleanedArguments, res2...)
+			res3, err := ParseArguments(cleanedArguments)
+			if err != 0 {
+				return arguments, -5
+			}
+			arguments = append(arguments, res3...)
+			cleanedArguments = strings.Split(res1[1], " ")
+		} else {
+			cleanedArguments = append(cleanedArguments, a)
+		}
+	}
+
 	// Parse arguments
-	for i, a := range args {
+	for i, a := range cleanedArguments {
 		if os.Getenv("XCOPY_DEBUG") == "true" {
 			fmt.Printf("XCOPY_DEBUG_ARGS[%d]: `%s`\n", i, a)
 		}
 		if strings.HasPrefix(a, "/") && (len(a) == 2 || len(a) == 3) {
 			switch a {
 			case "/A":
-				arguments.Flags.A = true
+				currentArguments.Flags.A = true
 			case "/C":
-				arguments.Flags.C = true
+				currentArguments.Flags.C = true
 			case "/D":
-				arguments.Flags.D = true
+				currentArguments.Flags.D = true
 			case "/E":
-				arguments.Flags.E = true
+				currentArguments.Flags.E = true
 			case "/F":
-				arguments.Flags.F = true
+				currentArguments.Flags.F = true
 			case "/H":
-				arguments.Flags.H = true
+				currentArguments.Flags.H = true
 			case "/I":
-				arguments.Flags.I = true
+				currentArguments.Flags.I = true
 			case "/L":
-				arguments.Flags.L = true
+				currentArguments.Flags.L = true
 			case "/M":
-				arguments.Flags.M = true
+				currentArguments.Flags.M = true
 			case "/N":
-				arguments.Flags.N = true
+				currentArguments.Flags.N = true
 			case "/P":
-				arguments.Flags.P = true
+				currentArguments.Flags.P = true
 			case "/Q":
-				arguments.Flags.Q = true
+				currentArguments.Flags.Q = true
 			case "/R":
-				arguments.Flags.R = true
+				currentArguments.Flags.R = true
 			case "/S":
-				arguments.Flags.S = true
+				currentArguments.Flags.S = true
 			case "/T":
-				arguments.Flags.T = true
+				currentArguments.Flags.T = true
 			case "/V":
-				arguments.Flags.V = true
+				currentArguments.Flags.V = true
 			case "/W":
-				arguments.Flags.W = true
+				currentArguments.Flags.W = true
 			case "/Y":
-				arguments.Flags.Y = true
+				currentArguments.Flags.Y = true
 			case "/-Y":
-				arguments.Flags.MinusY = true
+				currentArguments.Flags.MinusY = true
 			}
 		} else {
 			if strings.HasPrefix(a, "/D") && (len(a) == 8) {
-				arguments.Flags.D = true
-				arguments.Flags.ParamsD = a[2:]
+				currentArguments.Flags.D = true
+				currentArguments.Flags.ParamsD = a[2:]
 			} else {
-				if arguments.Source == "" {
-					arguments.Source = strings.ReplaceAll(strings.Trim(a, "\""), "\\", "/")
-					arguments.UsesWildcards = strings.Contains(arguments.Source, "*")
-					arguments.IsSourceDir = strings.HasSuffix(arguments.Source, "/")
+				if currentArguments.Source == "" {
+					currentArguments.Source = strings.ReplaceAll(strings.Trim(a, "\""), "\\", "/")
+					currentArguments.UsesWildcards = strings.Contains(currentArguments.Source, "*")
+					currentArguments.IsSourceDir = strings.HasSuffix(currentArguments.Source, "/")
 				} else {
-					arguments.Dest = strings.ReplaceAll(strings.Trim(a, "\""), "\\", "/")
-					arguments.IsDestDir = strings.HasSuffix(arguments.Dest, "/")
+					currentArguments.Dest = strings.ReplaceAll(strings.Trim(a, "\""), "\\", "/")
+					currentArguments.IsDestDir = strings.HasSuffix(currentArguments.Dest, "/")
 				}
 			}
 		}
 	}
 
-	if arguments.Dest == "" || arguments.Source == "" {
+	if currentArguments.Dest == "" || currentArguments.Source == "" {
 		return arguments, -2
 	}
 
+	arguments = append(arguments, currentArguments)
 	// exitCode := 0
 	// arguments.IsSourceDir, exitCode = IsDirectory(arguments.Source)
 	// if exitCode != 0 {
@@ -205,67 +225,71 @@ func main() {
 		// fmt.Println("  /-Y          Causes prompting to confirm you want to overwrite an existing destination file.")
 		if os.Getenv("XCOPY_DEBUG") == "true" {
 			fmt.Println("DEBUG:")
-			fmt.Printf("      SOURCE: `%s`\n", args.Source)
-			fmt.Printf("        DEST: `%s`\n", args.Dest)
-			fmt.Printf("  SOURCE_DIR: `%t`\n", args.IsSourceDir)
-			fmt.Printf("    DEST_DIR: `%t`\n", args.IsDestDir)
-			fmt.Printf("           *: `%t`\n", args.UsesWildcards)
-			fmt.Printf("          /A: `%t`\n", args.Flags.A)
-			fmt.Printf("          /C: `%t`\n", args.Flags.C)
-			fmt.Printf("          /D: `%t`\n", args.Flags.D)
-			fmt.Printf("           D: `%s`\n", args.Flags.ParamsD)
-			fmt.Printf("          /E: `%t`\n", args.Flags.E)
-			fmt.Printf("          /F: `%t`\n", args.Flags.F)
-			fmt.Printf("          /H: `%t`\n", args.Flags.H)
-			fmt.Printf("          /I: `%t`\n", args.Flags.I)
-			fmt.Printf("          /L: `%t`\n", args.Flags.L)
-			fmt.Printf("          /M: `%t`\n", args.Flags.M)
-			fmt.Printf("          /N: `%t`\n", args.Flags.N)
-			fmt.Printf("          /P: `%t`\n", args.Flags.P)
-			fmt.Printf("          /Q: `%t`\n", args.Flags.Q)
-			fmt.Printf("          /R: `%t`\n", args.Flags.R)
-			fmt.Printf("          /S: `%t`\n", args.Flags.S)
-			fmt.Printf("          /T: `%t`\n", args.Flags.T)
-			fmt.Printf("          /V: `%t`\n", args.Flags.V)
-			fmt.Printf("          /W: `%t`\n", args.Flags.W)
-			fmt.Printf("          /Y: `%t`\n", args.Flags.Y)
-			fmt.Printf("         /-Y: `%t`\n", args.Flags.MinusY)
+			for i, a := range args {
+				fmt.Printf("      SOURCE[%d]: `%s`\n", i, a.Source)
+				fmt.Printf("        DEST[%d]: `%s`\n", i, a.Dest)
+				fmt.Printf("  SOURCE_DIR[%d]: `%t`\n", i, a.IsSourceDir)
+				fmt.Printf("    DEST_DIR[%d]: `%t`\n", i, a.IsDestDir)
+				fmt.Printf("           *[%d]: `%t`\n", i, a.UsesWildcards)
+				fmt.Printf("          /A[%d]: `%t`\n", i, a.Flags.A)
+				fmt.Printf("          /C[%d]: `%t`\n", i, a.Flags.C)
+				fmt.Printf("          /D[%d]: `%t`\n", i, a.Flags.D)
+				fmt.Printf("           D[%d]: `%s`\n", i, a.Flags.ParamsD)
+				fmt.Printf("          /E[%d]: `%t`\n", i, a.Flags.E)
+				fmt.Printf("          /F[%d]: `%t`\n", i, a.Flags.F)
+				fmt.Printf("          /H[%d]: `%t`\n", i, a.Flags.H)
+				fmt.Printf("          /I[%d]: `%t`\n", i, a.Flags.I)
+				fmt.Printf("          /L[%d]: `%t`\n", i, a.Flags.L)
+				fmt.Printf("          /M[%d]: `%t`\n", i, a.Flags.M)
+				fmt.Printf("          /N[%d]: `%t`\n", i, a.Flags.N)
+				fmt.Printf("          /P[%d]: `%t`\n", i, a.Flags.P)
+				fmt.Printf("          /Q[%d]: `%t`\n", i, a.Flags.Q)
+				fmt.Printf("          /R[%d]: `%t`\n", i, a.Flags.R)
+				fmt.Printf("          /S[%d]: `%t`\n", i, a.Flags.S)
+				fmt.Printf("          /T[%d]: `%t`\n", i, a.Flags.T)
+				fmt.Printf("          /V[%d]: `%t`\n", i, a.Flags.V)
+				fmt.Printf("          /W[%d]: `%t`\n", i, a.Flags.W)
+				fmt.Printf("          /Y[%d]: `%t`\n", i, a.Flags.Y)
+				fmt.Printf("         /-Y[%d]: `%t`\n", i, a.Flags.MinusY)
+			}
 		}
 		os.Exit(errCode)
 	}
 
-	if args.IsSourceDir {
-		os.Exit(13)
-		// files, err = os.ReadDir(source)
-		// if err != nil {
-		// 	fmt.Println("Error reading source directory")
-		// 	os.Exit(4)
-		// }
+	for _, arg := range args {
+		if arg.IsSourceDir {
+			os.Exit(13)
+			// files, err = os.ReadDir(source)
+			// if err != nil {
+			// 	fmt.Println("Error reading source directory")
+			// 	os.Exit(4)
+			// }
 
-		// // Destination also needs to be a folder
-		// fi, err = os.Stat(dest)
-		// if err != nil {
-		// 	fmt.Println(err)
-		// 	os.Exit(4)
-		// }
-		// switch mode := fi.Mode(); {
-		// case mode.IsDir():
-		// 	isDestDir = true
-		// default:
-		// 	fmt.Println("Error reading destination directory")
-		// 	os.Exit(4)
-		// }
-	} else if args.UsesWildcards {
-		files, err := filepath.Glob(args.Source)
-		if err != nil {
-			fmt.Printf("Error opening source files %s: %v\n", args.Source, err)
-			os.Exit(1)
+			// // Destination also needs to be a folder
+			// fi, err = os.Stat(dest)
+			// if err != nil {
+			// 	fmt.Println(err)
+			// 	os.Exit(4)
+			// }
+			// switch mode := fi.Mode(); {
+			// case mode.IsDir():
+			// 	isDestDir = true
+			// default:
+			// 	fmt.Println("Error reading destination directory")
+			// 	os.Exit(4)
+			// }
+		} else if arg.UsesWildcards {
+			files, err := filepath.Glob(arg.Source)
+			if err != nil {
+				fmt.Printf("Error opening source files %s: %v\n", arg.Source, err)
+				os.Exit(1)
+			}
+			for _, f := range files {
+				CopyFile(f, arg.Dest, arg.IsDestDir)
+			}
+		} else {
+			CopyFile(arg.Source, arg.Dest, arg.IsDestDir)
 		}
-		for _, f := range files {
-			CopyFile(f, args.Dest, args.IsDestDir)
-		}
-	} else {
-		CopyFile(args.Source, args.Dest, args.IsDestDir)
 	}
 
 	os.Exit(0)
