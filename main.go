@@ -40,23 +40,24 @@ type XCopyFlags struct {
 	ParamsD string `default:""`
 }
 
-// func IsDirectory(path string) (bool, int) {
-// 	fi, err := os.Stat(path)
-// 	if err != nil {
-// 		if strings.HasSuffix(path, "/") {
-// 			return true, 0
-// 		}
-// 		if os.Getenv("XCOPY_DEBUG") == "true" {
-// 			fmt.Println(err.Error())
-// 		}
-// 		return false, -3
-// 	}
-// 	switch mode := fi.Mode(); {
-// 	case mode.IsDir():
-// 		return true, 0
-// 	}
-// 	return false, 0
-// }
+func IsDirectory(path string) bool {
+	if strings.HasSuffix(path, "/") {
+		return true
+	}
+
+	fi, err := os.Stat(path)
+	if err != nil {
+		if os.Getenv("XCOPY_DEBUG") == "true" {
+			fmt.Println(err.Error())
+		}
+		return false
+	}
+	switch mode := fi.Mode(); {
+	case mode.IsDir():
+		return true
+	}
+	return false
+}
 
 // Hello returns a greeting for the named person.
 func ParseArguments(args []string) ([]InputArguments, int) {
@@ -139,10 +140,10 @@ func ParseArguments(args []string) ([]InputArguments, int) {
 				if currentArguments.Source == "" {
 					currentArguments.Source = strings.ReplaceAll(strings.Trim(a, "\""), "\\", "/")
 					currentArguments.UsesWildcards = strings.Contains(currentArguments.Source, "*")
-					currentArguments.IsSourceDir = strings.HasSuffix(currentArguments.Source, "/")
+					currentArguments.IsSourceDir = IsDirectory(currentArguments.Source)
 				} else {
 					currentArguments.Dest = strings.ReplaceAll(strings.Trim(a, "\""), "\\", "/")
-					currentArguments.IsDestDir = strings.HasSuffix(currentArguments.Dest, "/")
+					currentArguments.IsDestDir = IsDirectory(currentArguments.Dest)
 				}
 			}
 		}
